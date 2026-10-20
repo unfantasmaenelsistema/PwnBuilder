@@ -1,246 +1,70 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PwnBuilder - Generador de Comandos</title>
-    
-    <link rel="manifest" href="/PwnBuilder/manifest.json">
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/PwnBuilder/sw.js')
-                    .then(reg => console.log('Service Worker registrado con éxito.', reg.scope))
-                    .catch(err => console.log('Fallo en el registro del Service Worker:', err));
-            });
-        }
-    </script>
-    
-    <style>
-        /* Estilos generales y fondo oscuro */
-        body {
-            font-family: 'Courier New', Courier, monospace;
-            background-color: #121212;
-            color: #e0e0e0;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-        }
-
-        header {
-            margin-bottom: 20px;
-        }
-
-        h1, h2 {
-            color: #00ff88;
-        }
-
-        /* Estilos del logo */
-        .logo-container {
-            margin-bottom: 20px;
-        }
-
-        .logo-container img {
-            width: 150px; /* Ajusta el tamaño de la imagen */
-            height: auto;
-        }
-
-        hr {
-            border: 1px solid #00ff88;
-            width: 80%;
-            margin: 20px 0;
-        }
-        
-        /* Estilos del selector de herramientas */
-        select {
-            width: 80%;
-            max-width: 400px;
-            padding: 10px;
-            margin-bottom: 20px;
-            border: 1px solid #00ff88;
-            background-color: #1e1e1e;
-            color: #e0e0e0;
-            border-radius: 5px;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 1em;
-        }
-
-        /* Estilos del contenedor del formulario de herramientas */
-        #toolFormContainer {
-            background-color: #1e1e1e;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
-            max-width: 800px;
-            width: 100%;
-            margin-top: 20px;
-        }
-        
-        /* Estilos para los formularios de herramientas */
-        .form-section {
-            margin-bottom: 20px;
-        }
-        
-        .form-section h3 {
-            color: #00ff88;
-            border-bottom: 1px solid #00ff88;
-            padding-bottom: 5px;
-        }
-        
-        .form-section label {
-            display: block;
-            margin-top: 10px;
-            margin-bottom: 5px;
-            text-align: left;
-        }
-        
-        .form-section input, .form-section select {
-            width: 95%;
-            padding: 8px;
-            margin-bottom: 10px;
-            background-color: #2b2b2b;
-            border: 1px solid #00ff88;
-            color: #e0e0e0;
-            border-radius: 4px;
-        }
-        
-        .form-section button {
-            background-color: #00ff88;
-            color: #121212;
-            border: none;
-            padding: 10px 20px;
-            cursor: pointer;
-            border-radius: 4px;
-            font-weight: bold;
-            margin-top: 10px;
-        }
-        
-        .command-box {
-            background-color: #000;
-            padding: 15px;
-            border: 2px solid #00ff88;
-            border-radius: 5px;
-            margin-top: 20px;
-            text-align: left;
-        }
-        
-        .command-box h4 {
-            color: #00ff88;
-            margin-top: 0;
-        }
-        
-        .command-box p {
-            color: #e0e0e0;
-            word-wrap: break-word;
-            font-size: 0.9em;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PwnBuilder · Un Fantasma en el Sistema</title>
+<meta name="description" content="Generador de comandos para 42 herramientas de pentesting y CTF (nmap, hydra, sqlmap, hashcat, aircrack-ng, Metasploit…). Monta el comando marcando opciones. Para uso autorizado. 100% en el navegador.">
+<link rel="icon" href="icono.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#00ff88">
+<script>
+  // Tema antes de pintar, para que no parpadee
+  (function(){var t=null;try{t=localStorage.getItem('pwn-theme');}catch(e){}
+  if(!t)t=(window.matchMedia&&matchMedia('(prefers-color-scheme: light)').matches)?'light':'dark';
+  document.documentElement.setAttribute('data-theme',t);})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    
-    <div class="logo-container">
-        <img src="/PwnBuilder/logo.png" alt="PwnBuilder Logo">
-    </div>
+<header>
+  <a href="https://www.unfantasmaenelsistema.com" target="_blank" rel="noopener" class="logo">
+    <img src="icono.png" alt="Un Fantasma en el Sistema">
+    <span>Pwn<b>Builder</b></span>
+  </a>
+  <div class="hdr-right">
+    <a href="https://www.unfantasmaenelsistema.com" target="_blank" rel="noopener" class="site-link">unfantasmaenelsistema.com</a>
+    <button id="langToggle" class="hdr-btn" type="button">EN</button>
+    <button id="themeToggle" class="hdr-btn" type="button">☀</button>
+  </div>
+</header>
 
-    <header>
-        <h1>PwnBuilder</h1>
-        <p>Generador de Comandos para CTFs</p>
-    </header>
-    <hr>
-    <h2>Selecciona una herramienta:</h2>
-    <select id="toolSelector" onchange="loadToolForm()">
-        <option value="">-- Elige una herramienta --</option>
-        <option value="aircrackng">Aircrack</option>
-        <option value="aireplayng">Aireplay</option>
-        <option value="airmonng">Airmon</option>
-        <option value="airodumpng">Airodump</option>
-        <option value="arpspoof">Arpspoof</option>
-        <option value="binwalk">Binwalk</option>
-        <option value="cewl">Cewl</option>
-        <option value="commix">Commix</option>
-        <option value="crunch">Crunch</option>
-        <option value="dig">Dig</option>
-        <option value="dirb">Dirb</option>
-        <option value="dnsenum">Dnsenum</option>
-        <option value="dsniff">Dsniff</option>
-        <option value="enum4linux">Enum4linux</option>
-        <option value="ettercap">Ettercap</option>
-        <option value="fierce">Fierce</option>
-        <option value="foremost">Foremost</option>
-        <option value="gdb">Gdb</option>
-        <option value="hashcat">Hashcat</option>
-        <option value="hydra">Hydra</option>
-        <option value="jtr">JohnTheRipper</option>
-        <option value="medusa">Medusa</option>
-        <option value="meterpreter">Meterpreter</option>
-        <option value="msfconsole">Msfconsole</option>
-        <option value="netcat">Netcat</option>
-        <option value="netdiscover">Netdiscover</option>
-        <option value="nikto">Nikto</option>
-        <option value="nmap">Nmap</option>
-        <option value="objdump">Objdump</option>
-        <option value="radare2">Radare2</option>
-        <option value="searchsploit">Searchsploit</option>
-        <option value="socat">Socat</option>
-        <option value="sqlmap">Sqlmap</option>
-        <option value="strace">Strace</option>
-        <option value="strings">Strings</option>
-        <option value="tcpdump">Tcpdump</option>
-        <option value="theHarvester">TheHarvester</option>
-        <option value="tshark">Tshark</option>
-        <option value="whois">Whois</option>
-        <option value="wpscan">Wpscan</option>
-        <option value="volatility">Volatility</option>
-    </select>
-    <div id="toolFormContainer">
-    </div>
-    
-    <script src="main.js"></script>
-    <script src="tools/nmap.js"></script>
-    <script src="tools/hydra.js"></script>
-    <script src="tools/dirb.js"></script>
-    <script src="tools/enum4linux.js"></script>
-    <script src="tools/jtr.js"></script>
-    <script src="tools/netcat.js"></script>
-    <script src="tools/nikto.js"></script>
-    <script src="tools/wfuzz.js"></script>
-    <script src="tools/aircrackng.js"></script>
-    <script src="tools/aireplayng.js"></script>
-    <script src="tools/airmonng.js"></script>
-    <script src="tools/airodumpng.js"></script>
-    <script src="tools/dnsenum.js"></script>
-    <script src="tools/dig.js"></script>
-    <script src="tools/ettercap.js"></script>
-    <script src="tools/hashcat.js"></script>
-    <script src="tools/medusa.js"></script>
-    <script src="tools/msfconsole.js"></script>
-    <script src="tools/searchsploit.js"></script>
-    <script src="tools/sqlmap.js"></script>
-    <script src="tools/tcpdump.js"></script>
-    <script src="tools/theHarvester.js"></script>
-    <script src="tools/tshark.js"></script>
-    <script src="tools/whois.js"></script>
-    <script src="tools/wpscan.js"></script>
-    <script src="tools/meterpreter.js"></script>
-    <script src="tools/socat.js"></script>
-    <script src="tools/arpspoof.js"></script>
-    <script src="tools/binwalk.js"></script>
-    <script src="tools/cewl.js"></script>
-    <script src="tools/commix.js"></script>
-    <script src="tools/crunch.js"></script>
-    <script src="tools/dsniff.js"></script>
-    <script src="tools/fierce.js"></script>
-    <script src="tools/foremost.js"></script>
-    <script src="tools/gdb.js"></script>
-    <script src="tools/netdiscover.js"></script>
-    <script src="tools/objdump.js"></script>
-    <script src="tools/radare2.js"></script>
-    <script src="tools/strace.js"></script>
-    <script src="tools/strings.js"></script>
-    <script src="tools/volatility.js"></script>
+<main>
+  <section class="intro">
+    <h1 data-i18n="tagline">Generador de comandos para pentesting y CTF</h1>
+    <p class="lead" data-i18n-html="lead"></p>
+    <div class="ethics" data-i18n-html="ethics"></div>
+  </section>
+
+  <section class="cmd-bar">
+    <div class="cmd" id="cmd">$</div>
+    <button class="btn" id="copyBtn" data-i18n="copy" disabled></button>
+  </section>
+  <p class="note inc" id="incNote" data-i18n="incomplete" hidden></p>
+
+  <div class="layout">
+    <aside class="side">
+      <input id="search" class="search" type="search" spellcheck="false" placeholder="Buscar herramienta…">
+      <div id="toolList" class="toollist"></div>
+    </aside>
+    <section class="card" id="panel"></section>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <a href="https://www.unfantasmaenelsistema.com" target="_blank" rel="noopener" class="footer-brand">
+    <img src="icono.png" alt="Un Fantasma en el Sistema" width="28" height="28">
+    <span><b>Un Fantasma en el Sistema</b><small>unfantasmaenelsistema.com</small></span>
+  </a>
+  <div class="footer-links">
+    <span data-i18n="fLocal"></span><span>·</span>
+    <a href="https://github.com/unfantasmaenelsistema/PwnBuilder" target="_blank" rel="noopener">GitHub</a><span>·</span><span>MIT</span>
+  </div>
+</footer>
+
+<script src="tools.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
-
